@@ -30,9 +30,15 @@ function App() {
 
   const handleLogin = async (result) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, {
-        qr_id: result[0].rawValue,
-      });
+      const response = await axios.post(
+        "https://aoncodev.work.gd/login",
+        {
+          qr_id: result[0].rawValue,
+        },
+        {
+          withCredentials: true, // Allow cookies to be included in requests
+        }
+      );
 
       const { id, name, role } = response.data;
 
