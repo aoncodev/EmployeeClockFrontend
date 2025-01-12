@@ -33,6 +33,8 @@ function App() {
       // Sending login request using fetch
       const loginResponse = await fetch(`${API_URL}/login`, {
         method: "POST",
+        credentials: "include", // Send cookies with the request
+
         headers: {
           "Content-Type": "application/json",
         },
