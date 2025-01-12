@@ -30,20 +30,45 @@ function App() {
 
   const handleLogin = async (result) => {
     try {
-      const response = await axios.post(
-        "https://aoncodev.work.gd/login",
-        {
-          qr_id: result[0].rawValue,
+      // Sending login request using fetch
+      const loginResponse = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          qr_id: result[0].rawValue,
+        }),
+        credentials: "include", // Allow cookies to be included in requests
+      });
+
+      // Check if the login request was successful
+      if (!loginResponse.ok) {
+        throw new Error(`Login failed: ${loginResponse.statusText}`);
+      }
+
+      const loginData = await loginResponse.json();
+      const { id, name, role } = loginData;
+
+      // Fetch employee status
+      const employeeStatusResponse = await fetch(
+        `${API_URL}/employee/status/${id}`,
         {
-          withCredentials: true, // Allow cookies to be included in requests
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Allow cookies to be included in requests
         }
       );
 
-      const { id, name, role } = response.data;
+      if (!employeeStatusResponse.ok) {
+        throw new Error(
+          `Failed to fetch employee status: ${employeeStatusResponse.statusText}`
+        );
+      }
 
-      const res = await axios.get(`${API_URL}/employee/status/${id}`);
-      const employeeStatus = res.data;
+      const employeeStatus = await employeeStatusResponse.json();
 
       setAttendance(employeeStatus.attendance);
       setBreaks(employeeStatus.breaks);
@@ -83,8 +108,7 @@ function App() {
       console.error("Login error:", error);
       setMessage({
         type: "error",
-        text:
-          error.response?.data?.detail || "Failed to log in. Please try again.",
+        text: error.message || "Failed to log in. Please try again.",
       });
     }
   };
