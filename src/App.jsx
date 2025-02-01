@@ -63,8 +63,14 @@ function App() {
       }
 
       if (employeeStatus.breaks && employeeStatus.breaks.length > 0) {
-        const lastBreak =
-          employeeStatus.breaks[employeeStatus.breaks.length - 1];
+        // Sort breaks by ID in descending order (assuming ID is numeric)
+        const sortedBreaks = [...employeeStatus.breaks].sort(
+          (a, b) => b.id - a.id
+        );
+
+        // Get the latest break (the one with the highest ID)
+        const lastBreak = sortedBreaks[0];
+
         if (!lastBreak.break_end) {
           setBreakType(lastBreak.break_type);
         } else {
